@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ResultsType } from '../types';
 
 function useFetch(url: string) {
   const [dataValue, setDataValue] = useState([]);
@@ -7,7 +8,6 @@ function useFetch(url: string) {
   const reqFunction = async () => {
     const response = await fetch(url);
     const data = await response.json();
-    console.log(data);
     setDataValue(data.results);
     setLoading(false);
   };
