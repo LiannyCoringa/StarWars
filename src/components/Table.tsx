@@ -9,27 +9,60 @@ function Table() {
   const [coluna, setColunaFilter] = useState('population');
   const [operador, setOperadorFilter] = useState('maior que');
   const [numero, setNumeroFilter] = useState('0');
+  const [stateFilter, setStateFilter] = useState([{
+    coluna: 'population',
+    operador: 'maior que',
+    numero: '0',
+  }]);
 
   const [newData, setNewData] = useState([]);
   const [stateButton, setStateButton] = useState(false);
+  const [increment, setIncrement] = useState(0);
 
   const handleClick = () => {
-    if (operador === 'maior que') {
-      const filtrado = dataValue
-        .filter((objValue) => Number(objValue[`${coluna}`]) > Number(numero));
-      setNewData(filtrado);
-      setStateButton(true);
-    } else if (operador === 'menor que') {
-      const filtrado = dataValue
-        .filter((objValue) => Number(objValue[`${coluna}`]) < Number(numero));
-      setNewData(filtrado);
-      setStateButton(true);
-    } else if (operador === 'igual a') {
-      const filtrado = dataValue
-        .filter((objValue) => Number(objValue[`${coluna}`]) === Number(numero));
-      setNewData(filtrado);
-      setStateButton(true);
+    if (increment >= 1) {
+      if (operador === 'maior que') {
+        const filtrado = newData
+          .filter((objValue) => Number(objValue[`${coluna}`]) > Number(numero));
+        setNewData(filtrado);
+        setStateButton(true);
+        setIncrement(increment + 1);
+      } else if (operador === 'menor que') {
+        const filtrado = newData
+          .filter((objValue) => Number(objValue[`${coluna}`]) < Number(numero));
+        setNewData(filtrado);
+        setStateButton(true);
+        setIncrement(increment + 1);
+      } else if (operador === 'igual a') {
+        const filtrado = newData
+          .filter((objValue) => Number(objValue[`${coluna}`]) === Number(numero));
+        setNewData(filtrado);
+        setStateButton(true);
+        setIncrement(increment + 1);
+      }
+    } else if (increment === 0) {
+      if (operador === 'maior que') {
+        const filtrado = dataValue
+          .filter((objValue) => Number(objValue[`${coluna}`]) > Number(numero));
+        setNewData(filtrado);
+        setStateButton(true);
+        setIncrement(increment + 1);
+      } else if (operador === 'menor que') {
+        const filtrado = dataValue
+          .filter((objValue) => Number(objValue[`${coluna}`]) < Number(numero));
+        setNewData(filtrado);
+        setStateButton(true);
+        setIncrement(increment + 1);
+      } else if (operador === 'igual a') {
+        const filtrado = dataValue
+          .filter((objValue) => Number(objValue[`${coluna}`]) === Number(numero));
+        setNewData(filtrado);
+        setStateButton(true);
+        setIncrement(increment + 1);
+      }
     }
+
+    setStateFilter([...stateFilter, { coluna, operador, numero }]);
   };
 
   return (
@@ -103,7 +136,7 @@ function Table() {
                 ))
                 : newData
                   .filter((obj: ResultsType) => obj.name.includes(filtro))
-                  .map((obj: ResultsType, index) => (
+                  .map((obj: ResultsType, index: number) => (
                     <tr key={ index }>
                       <td>{ obj.name }</td>
                       <td>{ obj.rotation_period }</td>
