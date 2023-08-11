@@ -13,3 +13,10 @@ export type ResultsType = {
   edited: string;
   url: string;
 };
+
+export type ColunaType =
+  'population'
+  | 'orbital_period'
+  | 'diameter'
+  | 'rotation_period'
+  | 'surface_water';

@@ -4,7 +4,33 @@ import { ResultsType } from '../types';
 
 function Table() {
   const [filtro, setFiltro] = useState('');
-  const { loading, dataValue, reqFunction } = useFetch('https://swapi.dev/api/planets');
+  const { loading, dataValue } = useFetch('https://swapi.dev/api/planets');
+
+  const [coluna, setColunaFilter] = useState('population');
+  const [operador, setOperadorFilter] = useState('maior que');
+  const [numero, setNumeroFilter] = useState('0');
+
+  const [newData, setNewData] = useState([]);
+  const [stateButton, setStateButton] = useState(false);
+
+  const handleClick = () => {
+    if (operador === 'maior que') {
+      const filtrado = dataValue
+        .filter((objValue) => Number(objValue[`${coluna}`]) > Number(numero));
+      setNewData(filtrado);
+      setStateButton(true);
+    } else if (operador === 'menor que') {
+      const filtrado = dataValue
+        .filter((objValue) => Number(objValue[`${coluna}`]) < Number(numero));
+      setNewData(filtrado);
+      setStateButton(true);
+    } else if (operador === 'igual a') {
+      const filtrado = dataValue
+        .filter((objValue) => Number(objValue[`${coluna}`]) === Number(numero));
+      setNewData(filtrado);
+      setStateButton(true);
+    }
+  };
 
   return (
     <div>
@@ -17,13 +43,46 @@ function Table() {
               data-testid="name-filter"
               onChange={ (event) => setFiltro(event.target.value) }
             />
+            <form>
+              <select
+                data-testid="column-filter"
+                onChange={ (event) => setColunaFilter(event.target.value) }
+              >
+                <option>population</option>
+                <option>orbital_period</option>
+                <option>diameter</option>
+                <option>rotation_period</option>
+                <option>surface_water</option>
+              </select>
+              <select
+                data-testid="comparison-filter"
+                onChange={ (event) => setOperadorFilter(event.target.value) }
+              >
+                <option>maior que</option>
+                <option>menor que</option>
+                <option>igual a</option>
+              </select>
+              <input
+                type="number"
+                data-testid="value-filter"
+                value={ numero }
+                onChange={ (event) => setNumeroFilter(event.target.value) }
+              />
+              <button
+                type="button"
+                data-testid="button-filter"
+                onClick={ handleClick }
+              >
+                Filtrar
+              </button>
+            </form>
             <table>
               <tr>
                 { Object.keys(dataValue[0])
                   .filter((key) => key !== 'residents')
                   .map((keyTable, index) => <th key={ index }>{ keyTable }</th>) }
               </tr>
-              { dataValue
+              { !stateButton ? dataValue
                 .filter((obj: ResultsType) => obj.name.includes(filtro))
                 .map((obj: ResultsType, index) => (
                   <tr key={ index }>
@@ -41,7 +100,26 @@ function Table() {
                     <td>{ obj.edited }</td>
                     <td>{ obj.url }</td>
                   </tr>
-                )) }
+                ))
+                : newData
+                  .filter((obj: ResultsType) => obj.name.includes(filtro))
+                  .map((obj: ResultsType, index) => (
+                    <tr key={ index }>
+                      <td>{ obj.name }</td>
+                      <td>{ obj.rotation_period }</td>
+                      <td>{ obj.orbital_period }</td>
+                      <td>{ obj.diameter }</td>
+                      <td>{ obj.climate }</td>
+                      <td>{ obj.gravity }</td>
+                      <td>{ obj.terrain }</td>
+                      <td>{ obj.surface_water }</td>
+                      <td>{ obj.population }</td>
+                      <td>{ obj.films }</td>
+                      <td>{ obj.created }</td>
+                      <td>{ obj.edited }</td>
+                      <td>{ obj.url }</td>
+                    </tr>
+                  )) }
             </table>
           </div>
         ) }

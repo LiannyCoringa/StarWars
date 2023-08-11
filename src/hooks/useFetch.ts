@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ResultsType } from '../types';
+import FilterContext from '../context/FilterContext';
 
 function useFetch(url: string) {
   const [dataValue, setDataValue] = useState([]);
