@@ -2,12 +2,6 @@ import { useState } from 'react';
 import useFetch from './useFetch';
 import { ColunaType } from '../types';
 
-type FilterType = {
-  coluna: string;
-  operador: string;
-  numero: string;
-};
-
 function useFilter(
   coluna: ColunaType | React.SetStateAction<string>,
   operador: string,

@@ -63,6 +63,22 @@ function Table() {
     }
 
     setStateFilter([...stateFilter, { coluna, operador, numero }]);
+    retiraFiltros(coluna);
+  };
+
+  const colunas = [
+    'population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water',
+  ];
+
+  const [colunasFiltro, setColunasFiltro] = useState(colunas);
+
+  const retiraFiltros = (colunaParam: string) => {
+    const colunasArray = colunas.filter((colunm) => colunm !== colunaParam);
+    setColunasFiltro(colunasArray);
   };
 
   return (
@@ -81,11 +97,9 @@ function Table() {
                 data-testid="column-filter"
                 onChange={ (event) => setColunaFilter(event.target.value) }
               >
-                <option>population</option>
-                <option>orbital_period</option>
-                <option>diameter</option>
-                <option>rotation_period</option>
-                <option>surface_water</option>
+                { colunasFiltro.map((colunm, index) => (
+                  <option key={ index }>{ colunm }</option>
+                )) }
               </select>
               <select
                 data-testid="comparison-filter"
@@ -109,6 +123,13 @@ function Table() {
                 Filtrar
               </button>
             </form>
+            { stateFilter.length > 1
+              && stateFilter.slice(1).map((filtros, index) => (
+                <div key={ index }>
+                  <p>{ `${filtros.coluna} ${filtros.operador} ${filtros.numero}` }</p>
+                  <button>X</button>
+                </div>
+              )) }
             <table>
               <tr>
                 { Object.keys(dataValue[0])
