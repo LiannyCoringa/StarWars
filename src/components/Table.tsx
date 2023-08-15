@@ -1,69 +1,44 @@
-import { useState } from 'react';
-import useFetch from '../hooks/useFetch';
+import { useContext, useEffect, useState } from 'react';
 import { ResultsType } from '../types';
+import PlanetsContext from '../context/PlanetsContext';
+import { PlanetsFilterType } from '../context/PlanetsProvider';
 
 function Table() {
   const [filtro, setFiltro] = useState('');
-  const { loading, dataValue } = useFetch('https://swapi.dev/api/planets');
-
+  const { newData, planetsFilter } = useContext(PlanetsContext);
+  const [planets, setPlanets] = useState<ResultsType[]>([]);
   const [coluna, setColunaFilter] = useState('population');
   const [operador, setOperadorFilter] = useState('maior que');
   const [numero, setNumeroFilter] = useState('0');
-  const [stateFilter, setStateFilter] = useState([{
-    coluna: 'population',
-    operador: 'maior que',
-    numero: '0',
-  }]);
+  const [loading, setLoading] = useState(true);
+  const [stateFilterArray, setStateFilterArray] = useState<PlanetsFilterType>([]);
 
-  const [newData, setNewData] = useState([]);
-  const [stateButton, setStateButton] = useState(false);
-  const [increment, setIncrement] = useState(0);
+  useEffect(() => {
+    const reqFunction = async () => {
+      const response = await fetch('https://swapi.dev/api/planets');
+      const data = await response.json();
+      setPlanets(data.results);
+      setLoading(false);
+    };
+    reqFunction();
+  }, []);
+
+  useEffect(() => {
+    if (stateFilterArray.length > 0) {
+      const newDataPlanets = planetsFilter(stateFilterArray, newData);
+      setPlanets(newDataPlanets);
+    } else {
+      setPlanets(newData);
+    }
+  }, [stateFilterArray]);
 
   const handleClick = () => {
-    if (increment >= 1) {
-      if (operador === 'maior que') {
-        const filtrado = newData
-          .filter((objValue) => Number(objValue[`${coluna}`]) > Number(numero));
-        setNewData(filtrado);
-        setStateButton(true);
-        setIncrement(increment + 1);
-      } else if (operador === 'menor que') {
-        const filtrado = newData
-          .filter((objValue) => Number(objValue[`${coluna}`]) < Number(numero));
-        setNewData(filtrado);
-        setStateButton(true);
-        setIncrement(increment + 1);
-      } else if (operador === 'igual a') {
-        const filtrado = newData
-          .filter((objValue) => Number(objValue[`${coluna}`]) === Number(numero));
-        setNewData(filtrado);
-        setStateButton(true);
-        setIncrement(increment + 1);
-      }
-    } else if (increment === 0) {
-      if (operador === 'maior que') {
-        const filtrado = dataValue
-          .filter((objValue) => Number(objValue[`${coluna}`]) > Number(numero));
-        setNewData(filtrado);
-        setStateButton(true);
-        setIncrement(increment + 1);
-      } else if (operador === 'menor que') {
-        const filtrado = dataValue
-          .filter((objValue) => Number(objValue[`${coluna}`]) < Number(numero));
-        setNewData(filtrado);
-        setStateButton(true);
-        setIncrement(increment + 1);
-      } else if (operador === 'igual a') {
-        const filtrado = dataValue
-          .filter((objValue) => Number(objValue[`${coluna}`]) === Number(numero));
-        setNewData(filtrado);
-        setStateButton(true);
-        setIncrement(increment + 1);
-      }
-    }
-
-    setStateFilter([...stateFilter, { coluna, operador, numero }]);
+    setStateFilterArray([...stateFilterArray, { coluna, operador, numero }]);
+    setColunasState([...colunasState, coluna]);
     retiraFiltros(coluna);
+    setColunaFilter('population');
+    setOperadorFilter('maior que');
+    setNumeroFilter('0');
   };
 
   const colunas = [
@@ -74,11 +49,23 @@ function Table() {
     'surface_water',
   ];
 
+  const [colunasState, setColunasState] = useState(['']);
   const [colunasFiltro, setColunasFiltro] = useState(colunas);
 
   const retiraFiltros = (colunaParam: string) => {
-    const colunasArray = colunas.filter((colunm) => colunm !== colunaParam);
-    setColunasFiltro(colunasArray);
+    setColunasFiltro(colunasFiltro.filter((string) => string !== colunaParam));
+  };
+
+  const handleClickFilter = (colunasFilterParam: string) => {
+    setColunasFiltro([...colunasFiltro, colunasFilterParam]);
+    const newFilter = stateFilterArray
+      .filter((obj) => obj.coluna !== colunasFilterParam);
+    setStateFilterArray(newFilter);
+  };
+
+  const handleClickDel = () => {
+    setStateFilterArray([]);
+    setColunasFiltro(colunas);
   };
 
   return (
@@ -95,6 +82,8 @@ function Table() {
             <form>
               <select
                 data-testid="column-filter"
+                id="coluna"
+                value={ coluna }
                 onChange={ (event) => setColunaFilter(event.target.value) }
               >
                 { colunasFiltro.map((colunm, index) => (
@@ -103,6 +92,8 @@ function Table() {
               </select>
               <select
                 data-testid="comparison-filter"
+                id="operador"
+                value={ operador }
                 onChange={ (event) => setOperadorFilter(event.target.value) }
               >
                 <option>maior que</option>
@@ -112,6 +103,7 @@ function Table() {
               <input
                 type="number"
                 data-testid="value-filter"
+                id="numero"
                 value={ numero }
                 onChange={ (event) => setNumeroFilter(event.target.value) }
               />
@@ -123,20 +115,34 @@ function Table() {
                 Filtrar
               </button>
             </form>
-            { stateFilter.length > 1
-              && stateFilter.slice(1).map((filtros, index) => (
+            { stateFilterArray.length > 0
+              && stateFilterArray.map((filtros, index) => (
                 <div key={ index }>
-                  <p>{ `${filtros.coluna} ${filtros.operador} ${filtros.numero}` }</p>
-                  <button>X</button>
+                  <p
+                    data-testid="filter"
+                  >
+                    { `${filtros.coluna} ${filtros.operador} ${filtros.numero}` }
+                    <button
+                      onClick={ () => handleClickFilter(filtros.coluna) }
+                    >
+                      X
+                    </button>
+                  </p>
                 </div>
               )) }
+            <button
+              data-testid="button-remove-filters"
+              onClick={ handleClickDel }
+            >
+              Remover todos os filtros
+            </button>
             <table>
               <tr>
-                { Object.keys(dataValue[0])
+                { Object.keys(planets[0])
                   .filter((key) => key !== 'residents')
                   .map((keyTable, index) => <th key={ index }>{ keyTable }</th>) }
               </tr>
-              { !stateButton ? dataValue
+              { planets
                 .filter((obj: ResultsType) => obj.name.includes(filtro))
                 .map((obj: ResultsType, index) => (
                   <tr key={ index }>
@@ -154,26 +160,7 @@ function Table() {
                     <td>{ obj.edited }</td>
                     <td>{ obj.url }</td>
                   </tr>
-                ))
-                : newData
-                  .filter((obj: ResultsType) => obj.name.includes(filtro))
-                  .map((obj: ResultsType, index: number) => (
-                    <tr key={ index }>
-                      <td>{ obj.name }</td>
-                      <td>{ obj.rotation_period }</td>
-                      <td>{ obj.orbital_period }</td>
-                      <td>{ obj.diameter }</td>
-                      <td>{ obj.climate }</td>
-                      <td>{ obj.gravity }</td>
-                      <td>{ obj.terrain }</td>
-                      <td>{ obj.surface_water }</td>
-                      <td>{ obj.population }</td>
-                      <td>{ obj.films }</td>
-                      <td>{ obj.created }</td>
-                      <td>{ obj.edited }</td>
-                      <td>{ obj.url }</td>
-                    </tr>
-                  )) }
+                )) }
             </table>
           </div>
         ) }

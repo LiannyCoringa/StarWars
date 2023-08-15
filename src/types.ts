@@ -20,3 +20,9 @@ export type ColunaType =
   | 'diameter'
   | 'rotation_period'
   | 'surface_water';
+
+export type FilterType = {
+  coluna: string,
+  operador: string,
+  numero: string,
+};
