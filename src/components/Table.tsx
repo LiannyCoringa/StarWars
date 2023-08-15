@@ -3,16 +3,24 @@ import { ResultsType } from '../types';
 import PlanetsContext from '../context/PlanetsContext';
 import { PlanetsFilterType } from '../context/PlanetsProvider';
 
+type Order = 'population'
+| 'orbital_period'
+| 'diameter'
+| 'rotation_period'
+| 'surface_water';
+
 function Table() {
   const [filtro, setFiltro] = useState('');
   const { newData, planetsFilter } = useContext(PlanetsContext);
-  const [planets, setPlanets] = useState<ResultsType[]>([]);
+  const [planets, setPlanets] = useState<ResultsType[] | any[]>([]);
   const [coluna, setColunaFilter] = useState('population');
   const [operador, setOperadorFilter] = useState('maior que');
   const [numero, setNumeroFilter] = useState('0');
   const [loading, setLoading] = useState(true);
   const [stateFilterArray, setStateFilterArray] = useState<PlanetsFilterType>([]);
-  const [orderSelect, setOrderSelect] = useState('population');
+  const [orderSelect, setOrderSelect] = useState<Order | any>('population');
+  const [inputOrder, setInputOrder] = useState('');
+  const [order, setOrder] = useState({ coluna: 'population', sort: '' });
 
   useEffect(() => {
     const reqFunction = async () => {
@@ -32,6 +40,30 @@ function Table() {
       setPlanets(newData);
     }
   }, [stateFilterArray]);
+
+  useEffect(() => {
+    let orderArray: any[] = planets;
+    const planetsNumber = planets.filter((planet) => planet.orderSelect !== 'unknown');
+    const planetsString = planets.filter((planet) => planet.orderSelect === 'unknown');
+    if (orderSelect === 'population') {
+      orderArray = planetsNumber.sort((a, b) => {
+        if (inputOrder === 'ASC') {
+          return Number(a[orderSelect]) - Number(b[orderSelect]);
+        }
+        return Number(b[orderSelect]) - Number(a[orderSelect]);
+      });
+      orderArray.push(planetsString);
+      setPlanets(orderArray);
+    } else {
+      orderArray = planets.sort((a, b) => {
+        if (inputOrder === 'ASC') {
+          return Number(a[orderSelect]) - Number(b[orderSelect]);
+        }
+        return Number(b[orderSelect]) - Number(a[orderSelect]);
+      });
+    }
+    setPlanets(orderArray);
+  }, [order]);
 
   const handleClick = () => {
     setStateFilterArray([...stateFilterArray, { coluna, operador, numero }]);
@@ -67,6 +99,10 @@ function Table() {
   const handleClickDel = () => {
     setStateFilterArray([]);
     setColunasFiltro(colunas);
+  };
+
+  const handleClickOrder = () => {
+    setOrder({ coluna: orderSelect, sort: inputOrder });
   };
 
   return (
@@ -129,6 +165,7 @@ function Table() {
                 value="ASC"
                 name="order"
                 id="ASC"
+                onChange={ (event) => setInputOrder(event.target.value) }
               />
               <label htmlFor="ASC">Ascendente</label>
               <input
@@ -137,11 +174,13 @@ function Table() {
                 value="DESC"
                 name="order"
                 id="DESC"
+                onChange={ (event) => setInputOrder(event.target.value) }
               />
               <label htmlFor="DESC">Descendente</label>
               <button
                 type="button"
                 data-testid="column-sort-button"
+                onClick={ handleClickOrder }
               >
                 Ordenar
               </button>
