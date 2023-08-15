@@ -12,6 +12,7 @@ function Table() {
   const [numero, setNumeroFilter] = useState('0');
   const [loading, setLoading] = useState(true);
   const [stateFilterArray, setStateFilterArray] = useState<PlanetsFilterType>([]);
+  const [orderSelect, setOrderSelect] = useState('population');
 
   useEffect(() => {
     const reqFunction = async () => {
@@ -114,6 +115,36 @@ function Table() {
               >
                 Filtrar
               </button>
+              <select
+                data-testid="column-sort"
+                onChange={ (event) => setOrderSelect(event.target.value) }
+              >
+                { colunas.map((column, index) => (
+                  <option key={ index }>{ column }</option>
+                )) }
+              </select>
+              <input
+                type="radio"
+                data-testid="column-sort-input-asc"
+                value="ASC"
+                name="order"
+                id="ASC"
+              />
+              <label htmlFor="ASC">Ascendente</label>
+              <input
+                type="radio"
+                data-testid="column-sort-input-desc"
+                value="DESC"
+                name="order"
+                id="DESC"
+              />
+              <label htmlFor="DESC">Descendente</label>
+              <button
+                type="button"
+                data-testid="column-sort-button"
+              >
+                Ordenar
+              </button>
             </form>
             { stateFilterArray.length > 0
               && stateFilterArray.map((filtros, index) => (
@@ -146,7 +177,7 @@ function Table() {
                 .filter((obj: ResultsType) => obj.name.includes(filtro))
                 .map((obj: ResultsType, index) => (
                   <tr key={ index }>
-                    <td>{ obj.name }</td>
+                    <td data-testid="planet-name">{ obj.name }</td>
                     <td>{ obj.rotation_period }</td>
                     <td>{ obj.orbital_period }</td>
                     <td>{ obj.diameter }</td>
