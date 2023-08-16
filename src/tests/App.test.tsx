@@ -80,5 +80,55 @@ describe('Testa a chamada da API', () => {
     userEvent.type(inputValor, '12300');
     userEvent.click(buttonFiltrar);
     expect(yavin).not.toBeInTheDocument();
+  });
+  test('Testa se ao apagar um filtro, volta as infos', async () => {
+    render(<App />);
+    const hoth = await screen.findByText('Hoth');
+    const selectColuna = await screen.findByTestId('column-filter');
+    const selectOperad = await screen.findByTestId('comparison-filter');
+    const inputValor = await screen.findByTestId('value-filter');
+    const buttonFiltrar = await screen.findByRole('button', { name: 'Filtrar' });
+
+    userEvent.selectOptions(selectColuna, 'rotation_period');
+    userEvent.selectOptions(selectOperad, 'igual a');
+    userEvent.type(inputValor, '24');
+    userEvent.click(buttonFiltrar);
+
+
+    expect(hoth).not.toBeInTheDocument();
+
+    const buttonX = await screen.findByRole('button', { name: 'X' });
+    userEvent.click(buttonX);
+
+    const tatooine = await screen.findByText('Tatooine');
+    expect(tatooine).toBeInTheDocument();
+  });
+  test('Testa se ao clicar no button, remove todos os filtros', async () => {
+    render(<App />);
+    const selectColuna = await screen.findByTestId('column-filter');
+    const selectOperad = await screen.findByTestId('comparison-filter');
+    const inputValor = await screen.findByTestId('value-filter');
+    const buttonFiltrar = await screen.findByRole('button', { name: 'Filtrar' });
+
+    userEvent.selectOptions(selectColuna, 'rotation_period');
+    userEvent.selectOptions(selectOperad, 'igual a');
+    userEvent.type(inputValor, '24');
+    userEvent.click(buttonFiltrar);
+
+    const yavin = await screen.findByText('Yavin IV');
+    expect(yavin).toBeInTheDocument();
+
+    userEvent.selectOptions(selectColuna, 'diameter');
+    userEvent.selectOptions(selectOperad, 'maior que');
+    userEvent.type(inputValor, '12300');
+    userEvent.click(buttonFiltrar);
+
+    expect(yavin).not.toBeInTheDocument();
+
+    const buttonDel = await screen.findByTestId('button-remove-filters');
+    userEvent.click(buttonDel);
+
+    const yavinPlanet = await screen.findByText('Yavin IV');
+    expect(yavinPlanet).toBeInTheDocument();
   })
 })
