@@ -3,6 +3,12 @@ import { ResultsType } from '../types';
 import PlanetsContext from '../context/PlanetsContext';
 import { PlanetsFilterType } from '../context/PlanetsProvider';
 
+type Order = 'population'
+| 'orbital_period'
+| 'diameter'
+| 'rotation_period'
+| 'surface_water';
+
 function Table() {
   const [filtro, setFiltro] = useState('');
   const { newData, planetsFilter } = useContext(PlanetsContext);
@@ -12,6 +18,8 @@ function Table() {
   const [numero, setNumeroFilter] = useState('0');
   const [loading, setLoading] = useState(true);
   const [stateFilterArray, setStateFilterArray] = useState<PlanetsFilterType>([]);
+  const [orderSelect, setOrderSelect] = useState<Order | any>('');
+  const [inputOrder, setInputOrder] = useState('');
 
   useEffect(() => {
     const reqFunction = async () => {
@@ -69,6 +77,17 @@ function Table() {
     setColunasFiltro(colunas);
   };
 
+  const handleClickOrder = (orderSelect: string, inputOrder: string) => {
+    let orderArray: any[] = planets;
+    orderArray = planets.sort((a, b) => {
+      if (inputOrder === 'ASC') {
+        return Number(a[orderSelect]) - Number(b[orderSelect]);
+      }
+      return Number(b[orderSelect]) - Number(a[orderSelect]);
+    });
+    setPlanets(orderArray);
+  };
+
   return (
     <div>
       { loading
@@ -114,6 +133,40 @@ function Table() {
                 onClick={ handleClick }
               >
                 Filtrar
+              </button>
+              <select
+                data-testid="column-sort"
+                onChange={ (event) => setOrderSelect(event.target.value) }
+              >
+                <option>Selecione</option>
+                { colunas.map((column, index) => (
+                  <option key={ index }>{ column }</option>
+                )) }
+              </select>
+              <input
+                type="radio"
+                data-testid="column-sort-input-asc"
+                value="ASC"
+                name="order"
+                id="ASC"
+                onChange={ (event) => setInputOrder(event.target.value) }
+              />
+              <label htmlFor="ASC">Ascendente</label>
+              <input
+                type="radio"
+                data-testid="column-sort-input-desc"
+                value="DESC"
+                name="order"
+                id="DESC"
+                onChange={ (event) => setInputOrder(event.target.value) }
+              />
+              <label htmlFor="DESC">Descendente</label>
+              <button
+                type="button"
+                data-testid="column-sort-button"
+                onClick={ () => handleClickOrder(orderSelect, inputOrder) }
+              >
+                Ordenar
               </button>
             </form>
             { stateFilterArray.length > 0
