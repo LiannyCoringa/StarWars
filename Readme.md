@@ -1,8 +1,8 @@
-# Título do Projeto
+# StarWars
 
 ## Descrição
 
-Este repositório está em construção. Aqui você encontrará [breve resumo do projeto ou curso] e seus componentes.
+Este projeto foi desenvolvido pela Trybe e feito por mim. Nele, usamos react, componentes de classe e Context API. Foi criado pensando na renderização de uma tabela com os planetas de StarWars e suas informações, sendo possível também filtrar os planetas de acordo com sua população, diametro, orbital, rotação, entre outros. 
 
 ## Conteúdo
 
@@ -11,11 +11,7 @@ Este repositório está em construção. Aqui você encontrará [breve resumo do
 
 ## Instruções de Instalação
 
-Descreva aqui as instruções necessárias para configurar o ambiente de desenvolvimento e instalar quaisquer dependências.
-
-## Como Usar
-
-Explique como usar. Forneça exemplos de código, capturas de tela ou demonstrações.
+Clone o repositório na sua máquina e rode o comando: 'npm install'.
 
 ## Contribuição
 
@@ -28,6 +24,3 @@ Se você deseja contribuir para este projeto, siga estas etapas para contribuir:
 5. Abra um pull request neste repositório e aguarde o feedback.
 
 Lembre-se de que todas as contribuições são valorizadas e ajudam a tornar este projeto melhor para todos!
-
-## Continue como desejar este Readme.md
-**Observação:** Este repositório está em construção e será atualizado regularmente. Sinta-se à vontade para adicionar mais seções conforme necessário para o seu projeto.
