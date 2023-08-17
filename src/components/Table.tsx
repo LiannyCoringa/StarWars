@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { ResultsType } from '../types';
 import PlanetsContext from '../context/PlanetsContext';
 import { PlanetsFilterType } from '../context/PlanetsProvider';
+import './Table.css';
 
 type Order = 'population'
 | 'orbital_period'
@@ -91,20 +92,31 @@ function Table() {
   return (
     <div>
       { loading
-        ? <h2>Carregando...</h2>
+        ? (
+          <div className="loading">
+            <h2>Carregando...</h2>
+          </div>
+        )
         : (
           <div>
-            <input
-              type="text"
-              data-testid="name-filter"
-              onChange={ (event) => setFiltro(event.target.value) }
-            />
-            <form>
+            <header className="header">
+              <img src="starwarslogo.png" alt="logo starwars" />
+              <h1>Planets</h1>
+              <input
+                type="text"
+                data-testid="name-filter"
+                onChange={ (event) => setFiltro(event.target.value) }
+                placeholder="Busque aqui"
+                id="busca"
+              />
+            </header>
+            <form className="form">
               <select
                 data-testid="column-filter"
                 id="coluna"
                 value={ coluna }
                 onChange={ (event) => setColunaFilter(event.target.value) }
+                className="inputs"
               >
                 { colunasFiltro.map((colunm, index) => (
                   <option key={ index }>{ colunm }</option>
@@ -115,6 +127,7 @@ function Table() {
                 id="operador"
                 value={ operador }
                 onChange={ (event) => setOperadorFilter(event.target.value) }
+                className="inputs"
               >
                 <option>maior que</option>
                 <option>menor que</option>
@@ -126,17 +139,20 @@ function Table() {
                 id="numero"
                 value={ numero }
                 onChange={ (event) => setNumeroFilter(event.target.value) }
+                className="inputNumber"
               />
               <button
                 type="button"
                 data-testid="button-filter"
                 onClick={ handleClick }
+                className="inputs"
               >
                 Filtrar
               </button>
               <select
                 data-testid="column-sort"
                 onChange={ (event) => setOrderSelect(event.target.value) }
+                className="inputs"
               >
                 <option>Selecione</option>
                 { colunas.map((column, index) => (
@@ -150,6 +166,7 @@ function Table() {
                 name="order"
                 id="ASC"
                 onChange={ (event) => setInputOrder(event.target.value) }
+                className="inputs"
               />
               <label htmlFor="ASC">Ascendente</label>
               <input
@@ -159,60 +176,71 @@ function Table() {
                 name="order"
                 id="DESC"
                 onChange={ (event) => setInputOrder(event.target.value) }
+                className="inputs"
               />
               <label htmlFor="DESC">Descendente</label>
               <button
                 type="button"
                 data-testid="column-sort-button"
                 onClick={ () => handleClickOrder(orderSelect, inputOrder) }
+                className="inputs"
               >
                 Ordenar
               </button>
             </form>
-            { stateFilterArray.length > 0
-              && stateFilterArray.map((filtros, index) => (
-                <div key={ index }>
-                  <p
-                    data-testid="filter"
-                  >
-                    { `${filtros.coluna} ${filtros.operador} ${filtros.numero}` }
-                    <button
-                      onClick={ () => handleClickFilter(filtros.coluna) }
+            <div className="filterContainer">
+              { stateFilterArray.length > 0
+                && stateFilterArray.map((filtros, index) => (
+                  <div key={ index }>
+                    <p
+                      data-testid="filter"
+                      id="filter"
                     >
-                      X
-                    </button>
-                  </p>
-                </div>
-              )) }
-            <button
-              data-testid="button-remove-filters"
-              onClick={ handleClickDel }
-            >
-              Remover todos os filtros
-            </button>
+                      { `${filtros.coluna} ${filtros.operador} ${filtros.numero}` }
+                      <button
+                        onClick={ () => handleClickFilter(filtros.coluna) }
+                        className="inputs"
+                        id="buttonX"
+                      >
+                        X
+                      </button>
+                    </p>
+                  </div>
+                )) }
+              <button
+                data-testid="button-remove-filters"
+                onClick={ handleClickDel }
+                className="inputs"
+                id="buttonDel"
+              >
+                Remover todos os filtros
+              </button>
+            </div>
             <table>
               <tr>
                 { Object.keys(planets[0])
                   .filter((key) => key !== 'residents')
-                  .map((keyTable, index) => <th key={ index }>{ keyTable }</th>) }
+                  .map((keyTable, index) => (
+                    <th key={ index } className="Coluna">{ keyTable }</th>
+                  )) }
               </tr>
               { planets
                 .filter((obj: ResultsType) => obj.name.includes(filtro))
                 .map((obj: ResultsType, index) => (
                   <tr key={ index }>
-                    <td data-testid="planet-name">{ obj.name }</td>
-                    <td>{ obj.rotation_period }</td>
-                    <td>{ obj.orbital_period }</td>
-                    <td>{ obj.diameter }</td>
-                    <td>{ obj.climate }</td>
-                    <td>{ obj.gravity }</td>
-                    <td>{ obj.terrain }</td>
-                    <td>{ obj.surface_water }</td>
-                    <td>{ obj.population }</td>
-                    <td>{ obj.films }</td>
-                    <td>{ obj.created }</td>
-                    <td>{ obj.edited }</td>
-                    <td>{ obj.url }</td>
+                    <td data-testid="planet-name" className="Coluna">{ obj.name }</td>
+                    <td className="Coluna">{ obj.rotation_period }</td>
+                    <td className="Coluna">{ obj.orbital_period }</td>
+                    <td className="Coluna">{ obj.diameter }</td>
+                    <td className="Coluna">{ obj.climate }</td>
+                    <td className="Coluna">{ obj.gravity }</td>
+                    <td className="Coluna">{ obj.terrain }</td>
+                    <td className="Coluna">{ obj.surface_water }</td>
+                    <td className="Coluna">{ obj.population }</td>
+                    <td className="Coluna">{ obj.films }</td>
+                    <td className="Coluna">{ obj.created }</td>
+                    <td className="Coluna">{ obj.edited }</td>
+                    <td className="Coluna">{ obj.url }</td>
                   </tr>
                 )) }
             </table>
